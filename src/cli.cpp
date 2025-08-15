@@ -22,8 +22,10 @@ bool Cli::par(int c, char **v, Cfg &o) {
         } else if (std::strcmp(v[i], "-f") == 0 && i + 1 < c) {
             std::strncpy(o.file, v[i + 1], sizeof(o.file) - 1);
             ++i;
+        } else if (std::strcmp(v[i], "-v") == 0) {
+            o.v = true;
         } else {
-            std::printf("use: %s [-d dev] [-b baud] [-c id|dump|erase|flash] [-a addr] [-l len] [-f file]\n", v[0]);
+            std::printf("use: %s [-d dev] [-b baud] [-c id|dump|erase|flash] [-a addr] [-l len] [-f file] [-v]\n", v[0]);
             return false;
         }
     }

@@ -7,11 +7,10 @@ class Swd {
 public:
     bool init();
     void rst();
-    bool wr(uint8_t cmd, uint32_t data);
-    bool rd(uint8_t cmd, uint32_t &data);
-    void set_io(Uart *u);
+    bool wr(Uart *u, uint8_t cmd, uint32_t data);
+    bool rd(Uart *u, uint8_t cmd, uint32_t &data);
 private:
     uint8_t crc(uint8_t *b, int n);
-    bool txrx(uint8_t *b, int n, int r);
-    Uart *io = nullptr;
+    bool txrx(Uart *io, uint8_t *b, int n, int r);
+    static const int max_try = 4;
 };

@@ -24,6 +24,8 @@ int main(int c, char **v) {
         return 1;
     }
 
+    if (cfg.v) std::printf("idcode: 0x%08lX\n", p.id());
+
     Core co;
     if (!co.hlt(&u)) {
         std::fprintf(stderr, "halt fail\n");
@@ -31,8 +33,7 @@ int main(int c, char **v) {
     }
 
     if (std::strcmp(cfg.cmd, "id") == 0) {
-        uint32_t id = p.id();
-        std::printf("idcode: 0x%08lX\n", id);
+        if (!cfg.v) std::printf("0x%08lX\n", p.id());
     } else if (std::strcmp(cfg.cmd, "dump") == 0) {
         uint8_t *buf = new uint8_t[cfg.len];
         Flash f;
@@ -47,15 +48,14 @@ int main(int c, char **v) {
             delete[] buf;
             return 1;
         }
-        std::printf("dump ok -> %s\n", cfg.file);
-        delete[] buf;
+        if (cfg.v) std::printf("dump ok -> %s\n", cfg.file);
     } else if (std::strcmp(cfg.cmd, "erase") == 0) {
         Flash f;
         if (!f.erase(&u, cfg.addr, cfg.addr + cfg.len)) {
             std::fprintf(stderr, "erase fail\n");
             return 1;
         }
-        std::puts("erase ok");
+        if (cfg.v) std::puts("erase ok");
     } else if (std::strcmp(cfg.cmd, "flash") == 0) {
         uint8_t *buf = new uint8_t[cfg.len];
         File fl;
@@ -75,7 +75,7 @@ int main(int c, char **v) {
             delete[] buf;
             return 1;
         }
-        std::printf("flash ok <- %s\n", cfg.file);
+        if (cfg.v) std::printf("flash ok <- %s\n", cfg.file);
         delete[] buf;
     } else {
         std::fprintf(stderr, "unknown cmd\n");
