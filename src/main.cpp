@@ -3,6 +3,7 @@
 #include "uart.hpp"
 #include "swd.hpp"
 #include "probe.hpp"
+#include "core.hpp"
 
 int main(int c, char **v) {
     Cfg cfg;
@@ -24,5 +25,12 @@ int main(int c, char **v) {
     uint32_t id = p.id();
     std::printf("idcode: 0x%08lX\n", id);
 
+    Core c;
+    if (!c.hlt(&u)) {
+        std::fprintf(stderr, "halt fail\n");
+        return 1;
+    }
+
+    std::puts("core halted");
     return 0;
 }
