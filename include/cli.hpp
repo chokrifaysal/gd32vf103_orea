@@ -7,9 +7,5 @@ struct Cfg {
     char cmd[16] = "id";
     uint32_t addr = 0x08000000;
     uint32_t len  = 0x1000;
-};
-
-class Cli {
-public:
-    bool par(int c, char **v, Cfg &o);
+    char file[256] = "fw.bin";
 };
