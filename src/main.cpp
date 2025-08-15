@@ -2,6 +2,7 @@
 #include "cli.hpp"
 #include "uart.hpp"
 #include "swd.hpp"
+#include "probe.hpp"
 
 int main(int c, char **v) {
     Cfg cfg;
@@ -13,8 +14,15 @@ int main(int c, char **v) {
         std::fprintf(stderr, "uart fail\n");
         return 1;
     }
-    Swd s;
-    s.set_io(&u);
-    std::printf("orea ready %s %u\n", cfg.dev, cfg.baud);
+
+    Probe p;
+    if (!p.dap(&u)) {
+        std::fprintf(stderr, "probe fail\n");
+        return 1;
+    }
+
+    uint32_t id = p.id();
+    std::printf("idcode: 0x%08lX\n", id);
+
     return 0;
 }
