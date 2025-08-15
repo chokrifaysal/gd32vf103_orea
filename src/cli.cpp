@@ -1,0 +1,19 @@
+#include "cli.hpp"
+#include <cstring>
+#include <cstdio>
+
+bool Cli::par(int c, char **v, Cfg &o) {
+    for (int i = 1; i < c; ++i) {
+        if (std::strcmp(v[i], "-d") == 0 && i + 1 < c) {
+            std::strncpy(o.dev, v[i + 1], sizeof(o.dev) - 1);
+            ++i;
+        } else if (std::strcmp(v[i], "-b") == 0 && i + 1 < c) {
+            o.baud = std::strtoul(v[i + 1], nullptr, 10);
+            ++i;
+        } else {
+            std::printf("use: %s [-d dev] [-b baud]\n", v[0]);
+            return false;
+        }
+    }
+    return true;
+}
