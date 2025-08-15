@@ -10,8 +10,17 @@ bool Cli::par(int c, char **v, Cfg &o) {
         } else if (std::strcmp(v[i], "-b") == 0 && i + 1 < c) {
             o.baud = std::strtoul(v[i + 1], nullptr, 10);
             ++i;
+        } else if (std::strcmp(v[i], "-c") == 0 && i + 1 < c) {
+            std::strncpy(o.cmd, v[i + 1], sizeof(o.cmd) - 1);
+            ++i;
+        } else if (std::strcmp(v[i], "-a") == 0 && i + 1 < c) {
+            o.addr = std::strtoul(v[i + 1], nullptr, 0);
+            ++i;
+        } else if (std::strcmp(v[i], "-l") == 0 && i + 1 < c) {
+            o.len = std::strtoul(v[i + 1], nullptr, 0);
+            ++i;
         } else {
-            std::printf("use: %s [-d dev] [-b baud]\n", v[0]);
+            std::printf("use: %s [-d dev] [-b baud] [-c id|dump] [-a addr] [-l len]\n", v[0]);
             return false;
         }
     }
