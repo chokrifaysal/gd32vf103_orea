@@ -1,8 +1,11 @@
 #include <cstdio>
 #include "uart.hpp"
+#include "swd.hpp"
 
 int main() {
-    Uart u;
     std::puts("orea");
+    Uart u;
+    Swd s;
+    s.set_io(&u);
     return 0;
 }

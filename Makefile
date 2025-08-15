@@ -30,3 +30,5 @@ $(BLD_PATH):
 
 clean:
 	rm -rf $(BLD_PATH)
+
+-include $(DEPS)
