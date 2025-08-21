@@ -6,6 +6,8 @@
 #include "core.hpp"
 #include "flash.hpp"
 #include "file.hpp"
+#include "sig.hpp"
+#include "patch.hpp"
 
 int main(int c, char **v) {
     Cfg cfg;
@@ -49,6 +51,7 @@ int main(int c, char **v) {
             return 1;
         }
         if (cfg.v) std::printf("dump ok -> %s\n", cfg.file);
+        delete[] buf;
     } else if (std::strcmp(cfg.cmd, "erase") == 0) {
         Flash f;
         if (!f.erase(&u, cfg.addr, cfg.addr + cfg.len)) {
@@ -76,6 +79,22 @@ int main(int c, char **v) {
             return 1;
         }
         if (cfg.v) std::printf("flash ok <- %s\n", cfg.file);
+        delete[] buf;
+    } else if (std::strcmp(cfg.cmd, "patch") == 0) {
+        uint8_t *buf = new uint8_t[cfg.len];
+        File fl;
+        if (!fl.rd(cfg.file, buf, cfg.len)) {
+            std::fprintf(stderr, "file fail\n");
+            delete[] buf;
+            return 1;
+        }
+        Patch pa;
+        if (!pa.wr(&u, cfg.addr, buf, cfg.len)) {
+            std::fprintf(stderr, "patch fail\n");
+            delete[] buf;
+            return 1;
+        }
+        if (cfg.v) std::printf("patch ok <- %s\n", cfg.file);
         delete[] buf;
     } else {
         std::fprintf(stderr, "unknown cmd\n");
