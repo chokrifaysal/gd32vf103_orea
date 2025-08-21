@@ -6,8 +6,7 @@
 #include "core.hpp"
 #include "flash.hpp"
 #include "file.hpp"
-#include "sig.hpp"
-#include "patch.hpp"
+#include "crc.hpp"
 
 int main(int c, char **v) {
     Cfg cfg;
@@ -44,13 +43,15 @@ int main(int c, char **v) {
             delete[] buf;
             return 1;
         }
+        Crc crc;
+        uint32_t c = crc.crc32(buf, cfg.len);
         File fl;
         if (!fl.wr(cfg.file, buf, cfg.len)) {
             std::fprintf(stderr, "file fail\n");
             delete[] buf;
             return 1;
         }
-        if (cfg.v) std::printf("dump ok -> %s\n", cfg.file);
+        if (cfg.v) std::printf("dump ok -> %s  crc32=0x%08lX\n", cfg.file, c);
         delete[] buf;
     } else if (std::strcmp(cfg.cmd, "erase") == 0) {
         Flash f;
@@ -67,6 +68,8 @@ int main(int c, char **v) {
             delete[] buf;
             return 1;
         }
+        Crc crc;
+        uint32_t c = crc.crc32(buf, cfg.len);
         Flash f;
         if (!f.erase(&u, cfg.addr, cfg.addr + cfg.len)) {
             std::fprintf(stderr, "erase fail\n");
@@ -78,24 +81,21 @@ int main(int c, char **v) {
             delete[] buf;
             return 1;
         }
-        if (cfg.v) std::printf("flash ok <- %s\n", cfg.file);
-        delete[] buf;
-    } else if (std::strcmp(cfg.cmd, "patch") == 0) {
-        uint8_t *buf = new uint8_t[cfg.len];
-        File fl;
-        if (!fl.rd(cfg.file, buf, cfg.len)) {
-            std::fprintf(stderr, "file fail\n");
+        uint8_t *chk = new uint8_t[cfg.len];
+        if (!f.rd(&u, cfg.addr, chk, cfg.len)) {
+            std::fprintf(stderr, "verify fail\n");
             delete[] buf;
+            delete[] chk;
             return 1;
         }
-        Patch pa;
-        if (!pa.wr(&u, cfg.addr, buf, cfg.len)) {
-            std::fprintf(stderr, "patch fail\n");
-            delete[] buf;
+        uint32_t v = crc.crc32(chk, cfg.len);
+        delete[] buf;
+        delete[] chk;
+        if (c != v) {
+            std::fprintf(stderr, "verify crc mismatch 0x%08lX != 0x%08lX\n", c, v);
             return 1;
         }
-        if (cfg.v) std::printf("patch ok <- %s\n", cfg.file);
-        delete[] buf;
+        if (cfg.v) std::printf("flash ok <- %s  crc32=0x%08lX\n", cfg.file, c);
     } else {
         std::fprintf(stderr, "unknown cmd\n");
         return 1;
